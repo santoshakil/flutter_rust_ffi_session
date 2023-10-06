@@ -1,12 +1,24 @@
-use libc::{c_char, c_int};
+use notify_rust::Notification;
 
 #[no_mangle]
-pub extern "C" fn add_two_numbers(a: *const c_char, b: *const c_char) -> c_int {
-    let a = unsafe { std::ffi::CStr::from_ptr(a).to_str().unwrap() }.to_string();
-    let b = unsafe { std::ffi::CStr::from_ptr(b).to_str().unwrap() }.to_string();
-    let a_int = a.parse::<i32>().unwrap();
-    let b_int = b.parse::<i32>().unwrap();
-    let c = a_int + b_int;
-    println!("SUM: {}", c);
-    c as c_int
+pub extern "C" fn show_notification_ffi(title: *const libc::c_char, body: *const libc::c_char) {
+    let title = unsafe { std::ffi::CStr::from_ptr(title).to_str().unwrap() }.to_string();
+    let body = unsafe { std::ffi::CStr::from_ptr(body).to_str().unwrap() }.to_string();
+    show_notification(title, body);
+}
+
+fn show_notification(title: String, body: String) {
+    if let Err(err) = Notification::new().summary(&title).body(&body).show() {
+        eprintln!("error showing notification: {}", err);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_show_notification() {
+        show_notification("title".to_string(), "body".to_string());
+    }
 }

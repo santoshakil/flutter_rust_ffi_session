@@ -7,4 +7,5 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+notify-rust = "4"
 libc = "0"
